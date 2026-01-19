@@ -1,0 +1,108 @@
+{
+  "format": [
+    {
+      "id": 1,
+      "pdf_pattern": null,
+      "sql_column_name": "vendorname",
+      "data_type": "varchar",
+      "format": null
+    },
+    {
+      "id": 2,
+      "pdf_pattern": null,
+      "sql_column_name": "pickupDate",
+      "data_type": "varchar",
+      "format": null
+    },
+    {
+      "id": 3,
+      "pdf_pattern": null,
+      "sql_column_name": "delDate",
+      "data_type": "varchar",
+      "format": null
+    },
+    {
+      "id": 4,
+      "pdf_pattern": null,
+      "sql_column_name": "po",
+      "data_type": "varchar",
+      "format": null
+    },
+    {
+      "id": 5,
+      "pdf_pattern": null,
+      "sql_column_name": "cases",
+      "data_type": "varchar",
+      "format": null
+    },
+    {
+      "id": 6,
+      "pdf_pattern": null,
+      "sql_column_name": "pallets",
+      "data_type": "varchar",
+      "format": null
+    },
+    {
+      "id": 7,
+      "pdf_pattern": null,
+      "sql_column_name": "weight",
+      "data_type": "varchar",
+      "format": null
+    },
+    {
+      "id": 8,
+      "pdf_pattern": null,
+      "sql_column_name": "cubes",
+      "data_type": "varchar",
+      "format": null
+    },
+    {
+      "id": 9,
+      "pdf_pattern": null,
+      "sql_column_name": "shipto",
+      "data_type": "varchar",
+      "format": null
+    },
+    {
+      "id": 10,
+      "pdf_pattern": null,
+      "sql_column_name": "temp",
+      "data_type": "varchar",
+      "format": null
+    },
+    {
+      "id": 11,
+      "pdf_pattern": null,
+      "sql_column_name": "invoiceRef",
+      "data_type": "varchar",
+      "format": null
+    },
+    {
+      "id": 12,
+      "pdf_pattern": null,
+      "sql_column_name": "pickApptNo",
+      "data_type": "varchar",
+      "format": null
+    },
+    {
+      "id": 13,
+      "pdf_pattern": null,
+      "sql_column_name": "vendorRef",
+      "data_type": "varchar",
+      "format": null
+    },
+    {
+      "id": 14,
+      "pdf_pattern": null,
+      "sql_column_name": "vendorno",
+      "data_type": "varchar",
+      "format": null
+    },
+    {
+      "id": 15,
+      "pdf_pattern": null,
+      "sql_column_name": "filename"
+    }
+  ],
+  "columnCount": 15
+}

@@ -1,0 +1,28 @@
+{
+  "slug": "pepsi_tenders_pdf_parser",
+  "display_name": "Pepsi Tenders PDF Parser",
+  "description": "Parses Pepsi Tenders PDF documents and extracts structured data using configurable regex-based rules.",
+  "version": "0.1.0",
+  "entrypoint": {
+    "type": "python",
+    "command": "python main.py"
+  },
+  "capabilities": [
+    {
+      "name": "la_pepsi_tenders_pdf_parser",
+      "description": "Extracts shipment data from a PDF file or a directory of PDFs using a JSON configuration.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "pdf_path": {
+            "type": "string",
+            "description": "Absolute path to a PDF file or a directory containing PDF files"
+          }
+        },
+        "required": ["pdf_path"]
+      }
+    }
+  ],
+  "author": "Ali Imran",
+  "tags": ["pdf", "parser", "shipment", "logistics", "regex"]
+}
