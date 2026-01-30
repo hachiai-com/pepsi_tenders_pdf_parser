@@ -7,9 +7,29 @@ import sys
 from concurrent.futures import ThreadPoolExecutor
 import pdfplumber
 
+try:
+    import mysql.connector
+except ImportError:
+    mysql = None
+
 
 CAPABILITY_NAME = "la_pepsi_tenders_pdf_parser"
 CONFIG_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.json")
+TABLE_NAME = "la_enhanced_shipment_creation_raw"
+DB_CONFIG = {
+    "host": os.environ.get("MYSQL_HOST", "127.0.0.1"),
+    "port": int(os.environ.get("MYSQL_PORT", "3307")),
+    "user": os.environ.get("MYSQL_USER", "neehar"),
+    "password": os.environ.get("MYSQL_PASSWORD", "X2fjRge7VtjDzETc"),
+    "database": os.environ.get("MYSQL_DATABASE", "sample_db"),
+}
+TABLE_COLUMNS_WHITELIST = {
+    "vendorname", "po", "vendorRef", "vendorno", "shipto", "consignee", "customer",
+    "vendorLoadAt", "delDate", "lifts", "pickApptNo", "weight", "pallets", "cases",
+    "cubes", "invoiceRef", "temp", "pickupDate", "template_flag", "description",
+    "ship_from", "shipment_type", "item_id", "monday_group_name", "email_from",
+    "filename", "audit_runs", "audit_status",
+}
 
 
 # -------------------------------------------------
@@ -19,6 +39,38 @@ CONFIG_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.j
 def load_json(path: str) -> dict:
     with open(path, "r", encoding="utf-8") as f:
         return json.load(f)
+
+
+def insert_results_to_db(results: list) -> tuple:
+    """
+    Insert parsed results into la_enhanced_shipment_creation_raw.
+    Returns (rows_inserted, error_message). error_message is None on success.
+    Skips any item that has an "error" key (e.g. PDF not found).
+    """
+    if mysql is None:
+        return 0, "mysql-connector-python not installed; run: pip install mysql-connector-python"
+    rows_inserted = 0
+    try:
+        conn = mysql.connector.connect(**DB_CONFIG)
+        cursor = conn.cursor()
+        for row in results:
+            if not isinstance(row, dict) or "error" in row:
+                continue
+            cols = [k for k in row.keys() if k in TABLE_COLUMNS_WHITELIST]
+            if not cols:
+                continue
+            placeholders = ", ".join(["%s"] * len(cols))
+            columns = ", ".join(f"`{c}`" for c in cols)
+            sql = f"INSERT INTO `{TABLE_NAME}` ({columns}) VALUES ({placeholders})"
+            values = [row.get(c) if row.get(c) != "" else None for c in cols]
+            cursor.execute(sql, values)
+            rows_inserted += 1
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return rows_inserted, None
+    except Exception as e:
+        return rows_inserted, str(e)
 
 
 def extract_pdf_text(pdf_path: str) -> str:
@@ -327,7 +379,27 @@ def main():
             response = la_pepsi_tenders_pdf_parser(
                 pdf_path=args.get("pdf_path")
             )
-            print(json.dumps(response, indent=2))
+            if "result" in response and response.get("result"):
+                rows_inserted, db_error = insert_results_to_db(response["result"])
+                out = {
+                    "capability": CAPABILITY_NAME,
+                    "rows_inserted": rows_inserted,
+                    "database": DB_CONFIG["database"],
+                    "table": TABLE_NAME,
+                }
+                if response.get("error"):
+                    out["error"] = response["error"]
+                if db_error:
+                    out["error"] = db_error
+            else:
+                out = {
+                    "capability": CAPABILITY_NAME,
+                    "error": response.get("error", "No result from parser"),
+                    "rows_inserted": 0,
+                    "database": DB_CONFIG["database"],
+                    "table": TABLE_NAME,
+                }
+            print(json.dumps(out, indent=2))
         else:
             print(json.dumps({
                 "error": f"Unknown capability: {capability}",
@@ -336,8 +408,11 @@ def main():
 
     except Exception as e:
         print(json.dumps({
-            "error": f"Error: {str(e)}",
-            "capability": "unknown"
+            "capability": "unknown",
+            "error": str(e),
+            "rows_inserted": 0,
+            "database": DB_CONFIG["database"],
+            "table": TABLE_NAME,
         }, indent=2))
         sys.exit(1)
 
