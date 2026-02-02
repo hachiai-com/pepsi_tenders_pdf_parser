@@ -21,7 +21,7 @@ DB_CONFIG = {
     "port": int(os.environ.get("MYSQL_PORT", "3307")),
     "user": os.environ.get("MYSQL_USER", "neehar"),
     "password": os.environ.get("MYSQL_PASSWORD", "X2fjRge7VtjDzETc"),
-    "database": os.environ.get("MYSQL_DATABASE", "sample_db"),
+    "database": os.environ.get("MYSQL_DATABASE", "logistics_alliance"),
 }
 TABLE_COLUMNS_WHITELIST = {
     "vendorname", "po", "vendorRef", "vendorno", "shipto", "consignee", "customer",
