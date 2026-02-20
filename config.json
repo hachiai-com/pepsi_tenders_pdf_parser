@@ -102,7 +102,12 @@
       "id": 15,
       "pdf_pattern": null,
       "sql_column_name": "filename"
+    },
+    {
+      "id": 16,
+      "pdf_pattern": null,
+      "sql_column_name": "ship_from"
     }
   ],
-  "columnCount": 15
+  "columnCount": 16
 }

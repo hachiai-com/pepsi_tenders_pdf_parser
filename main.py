@@ -190,6 +190,7 @@ class LAShipmentCreationPdfParser:
             "deliveryDate": self._extract_delivery_date(full_text),
             "invoiceRef": self._extract_invoice_ref(full_text),
             "shipTo": self._extract_ship_to(full_text),
+            "ship_from": self._extract_ship_from(full_text),
             "temp": self._extract_temp(full_text),
             "locationId": get_location_id(full_text),
             "stopId": "21200Y" if re.search(STOP_ONE_ADDRESS_REGEX, full_text, re.I) else "",
@@ -226,6 +227,7 @@ class LAShipmentCreationPdfParser:
                 record[12] = header_data["locationId"]
                 record[13] = header_data["stopId"]
                 record[14] = header_data["filename"]
+                record[15] = header_data["ship_from"]
 
                 # Set line item data
                 record[3] = m.group(3)              # po
@@ -337,6 +339,17 @@ class LAShipmentCreationPdfParser:
             #         "",
             #         m.group(1)
             #     ).strip()
+        return ""
+    
+    def _extract_ship_from(self, text: str) -> str:
+        
+        parts = text.split(HEADER_SPLIT)
+        # Debug: print parts length
+        # print(f"DEBUG: SHIP_FROM extraction - parts length: {len(parts)}", file=sys.stderr)
+        if len(parts) > 1:
+            m = re.search(SHIP_TO_REGEX, parts[0], re.S | re.M)
+            if m:
+                return m.group(1).replace("Address: ", "").replace("Appointment Info\n", "").strip()
         return ""
 
 
