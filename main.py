@@ -103,6 +103,7 @@ ALTERNATE_TEMP_REGEX = r"(OMS.*|OTHERS.*)\s+.*Page\s\d+ of \d+"
 SHIP_TO_REGEX = r"Location Name:\s+(.*)ARRIVE"
 # REGEX = r"^([0-9A-Z-]{5,})\s+([0-9A-Z-]{5,})\s+([0-9]+)\s+([0-9,]+)\s+([0-9,]+)\s+([0-9,]+)\s+([0-9,]+)$"
 REGEX = r"^([0-9A-Z-]{5,})\s+([0-9A-Z-]{3,})\s+([0-9A-Z\-]+)\s+(?:([A-Z]{3})\s+)?([0-9A-Z,]+)\s+([0-9,]+)\s+([0-9,]+)\s+([0-9,]+)$"
+ALT_REGEX = r"^([0-9A-Z-]+)\s+([0-9A-Z-]+)\s+(?:NUL\s+)?([0-9A-Z-]+)\s+(?:NUL\s+)?([0-9A-Z-]+)\s+([0-9,]+)\s+([0-9,]+)\s+([0-9,]+)\s+([0-9,]+)$"
 
 STOP_ONE_ADDRESS_REGEX = (
     r"DC Milton ON DWD\s+Address:\s+1890 READING COURT\s+Appointment Info\s+MILTON, ON L9T2X8"
@@ -212,7 +213,9 @@ class LAShipmentCreationPdfParser:
                 # print(f"line : {line}", file=sys.stderr)
                 m = re.match(REGEX, line.strip())
                 if not m:
-                    continue
+                        m = re.match(ALT_REGEX, line.strip())
+                        if not m:
+                            continue
                 # print(f"line matched: {line}", file=sys.stderr)
                 # Create a new record for each line item
                 record = [""] * self.column_count
