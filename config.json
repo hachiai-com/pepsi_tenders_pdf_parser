@@ -107,7 +107,12 @@
       "id": 16,
       "pdf_pattern": null,
       "sql_column_name": "ship_from"
+    },
+    {
+      "id": 17,
+      "pdf_pattern": null,
+      "sql_column_name": "customer"
     }
   ],
-  "columnCount": 16
+  "columnCount": 17
 }

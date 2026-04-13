@@ -233,12 +233,14 @@ class LAShipmentCreationPdfParser:
                 record[15] = header_data["ship_from"]
 
                 # Set line item data
-                record[3] = m.group(3)              # po
+                record[3] = m.group(4)              # po
                 record[4] = m.group(5)              # cases
                 record[5] = m.group(6)              # pallets
                 record[6] = m.group(7)              # weight
                 record[7] = m.group(8)              # cubes
-                record[11] = m.group(1)             # orderNo
+                # record[11] = m.group(1)             # orderNo
+                record[11] = m.group(3)              # D # or SAP Order#
+                record[16] = m.group(1)             # Pepsi Co Order#
 
                 # Convert to SQL column mapping
                 sql_mapping = {}
