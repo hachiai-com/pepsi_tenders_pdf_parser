@@ -28,7 +28,7 @@ TABLE_COLUMNS_WHITELIST = {
     "vendorLoadAt", "delDate", "lifts", "pickApptNo", "weight", "pallets", "cases",
     "cubes", "invoiceRef", "temp", "pickupDate", "template_flag", "description",
     "ship_from", "shipment_type", "item_id", "monday_group_name", "email_from",
-    "filename", "audit_runs", "audit_status",
+    "filename", "audit_runs", "audit_status", "customer_shipment_pepsi",
 }
 
 
