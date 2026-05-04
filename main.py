@@ -103,6 +103,7 @@ ALTERNATE_TEMP_REGEX = r"(OMS.*|OTHERS.*)\s+.*Page\s\d+ of \d+"
 SHIP_TO_REGEX = r"Location Name:\s+(.*)ARRIVE"
 # REGEX = r"^([0-9A-Z-]{5,})\s+([0-9A-Z-]{5,})\s+([0-9]+)\s+([0-9,]+)\s+([0-9,]+)\s+([0-9,]+)\s+([0-9,]+)$"
 REGEX = r"^([0-9A-Z-]{5,})\s+([0-9A-Z-]{3,})\s+([0-9A-Z\-]+)\s+(?:([A-Z]{3})\s+)?([0-9A-Z,]+)\s+([0-9,]+)\s+([0-9,]+)\s+([0-9,]+)$"
+ALT_ALT_REGEX = "^([0-9A-Z-]+)\s+([0-9A-Z-]+)\s+([0-9A-Z-]+)\s+([0-9A-Z-]+)\s+([0-9A-Z-]+)\s+([0-9,]+)\s+([0-9,]+)\s+([0-9,]+)\s+([0-9,]+)$"
 ALT_REGEX = r"^([0-9A-Z-]+)\s+([0-9A-Z-]+)\s+(?:NUL\s+)?([0-9A-Z-]+)\s+(?:NUL\s+)?([0-9A-Z-]+)\s+([0-9,]+)\s+([0-9,]+)\s+([0-9,]+)\s+([0-9,]+)$"
 
 STOP_ONE_ADDRESS_REGEX = (
@@ -212,14 +213,27 @@ class LAShipmentCreationPdfParser:
                 # Debug: print line
                 # print(f"line : {line}", file=sys.stderr)
                 m = re.match(REGEX, line.strip())
-                if not m:
-                        m = re.match(ALT_REGEX, line.strip())
-                        if not m:
-                            continue
+                if m:
+                    print(f"REGEX matched: {line}", file=sys.stderr)
+                else:
+                    m = re.match(ALT_REGEX, line.strip())
+                    if m:
+                        print(f"ALT_REGEX matched: {line}", file=sys.stderr)
+                        if m.group(4).upper() == "NUL":
+                            print(f"group 4 is NUL", file=sys.stderr)
+                            m = re.match(ALT_ALT_REGEX, line.strip())
+                            if m:
+                                print(f"ALT_ALT_REGEX matched: {line}", file=sys.stderr)
+                                alt_alt_regex_matched = True
+                        else:
+                            print(f"group 4 is NOT NUL", file=sys.stderr)
+                            # continue
+                    else:
+                        continue 
+                    
                 # print(f"line matched: {line}", file=sys.stderr)
                 # Create a new record for each line item
                 record = [""] * self.column_count
-
                 # Set header data for all records
                 record[0] = header_data["vendorname"]
                 record[1] = header_data["pickupDate"]
@@ -232,15 +246,28 @@ class LAShipmentCreationPdfParser:
                 record[14] = header_data["filename"]
                 record[15] = header_data["ship_from"]
 
-                # Set line item data
-                record[3] = m.group(4)              # po
-                record[4] = m.group(5)              # cases
-                record[5] = m.group(6)              # pallets
-                record[6] = m.group(7)              # weight
-                record[7] = m.group(8)              # cubes
-                # record[11] = m.group(1)             # orderNo
-                record[11] = m.group(3)              # D # or SAP Order#
-                record[16] = m.group(1)             # Pepsi Co Order#
+                if alt_alt_regex_matched:
+                    # Set line item data
+                    record[3] = m.group(4).replace("NUL", "").strip()              # po
+                    record[4] = m.group(6)              # cases
+                    record[5] = m.group(7)              # pallets
+                    record[6] = m.group(8)              # weight
+                    record[7] = m.group(9)              # cubes
+                    record[11] = m.group(3)              # D Number
+                    if record[11].upper() == "NUL":
+                        record[11] = m.group(2)          # SAP Order#
+                    record[16] = m.group(1)             # Pepsi Co Order#
+                else:
+                    # Set line item data
+                    record[3] = m.group(4).replace("NUL", "").strip()              # po
+                    record[4] = m.group(5)              # cases
+                    record[5] = m.group(6)              # pallets
+                    record[6] = m.group(7)              # weight
+                    record[7] = m.group(8)              # cubes
+                    record[11] = m.group(3)              # D Number
+                    if record[11].upper() == "NUL":
+                        record[11] = m.group(2)          # SAP Order#
+                    record[16] = m.group(1)             # Pepsi Co Order#
 
                 # Convert to SQL column mapping
                 sql_mapping = {}
