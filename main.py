@@ -103,7 +103,7 @@ ALTERNATE_TEMP_REGEX = r"(OMS.*|OTHERS.*)\s+.*Page\s\d+ of \d+"
 SHIP_TO_REGEX = r"Location Name:\s+(.*)ARRIVE"
 # REGEX = r"^([0-9A-Z-]{5,})\s+([0-9A-Z-]{5,})\s+([0-9]+)\s+([0-9,]+)\s+([0-9,]+)\s+([0-9,]+)\s+([0-9,]+)$"
 REGEX = r"^([0-9A-Z-]{5,})\s+([0-9A-Z-]{3,})\s+([0-9A-Z\-]+)\s+(?:([A-Z]{3})\s+)?([0-9A-Z,]+)\s+([0-9,]+)\s+([0-9,]+)\s+([0-9,]+)$"
-ALT_ALT_REGEX = "^([0-9A-Z-]+)\s+([0-9A-Z-]+)\s+([0-9A-Z-]+)\s+([0-9A-Z-]+)\s+([0-9A-Z-]+)\s+([0-9,]+)\s+([0-9,]+)\s+([0-9,]+)\s+([0-9,]+)$"
+ALT_ALT_REGEX = r"^([0-9A-Z-]+)\s+([0-9A-Z-]+)\s+([0-9A-Z-]+)\s+([0-9A-Z-]+)\s+([0-9A-Z-]+)\s+([0-9,]+)\s+([0-9,]+)\s+([0-9,]+)\s+([0-9,]+)$"
 ALT_REGEX = r"^([0-9A-Z-]+)\s+([0-9A-Z-]+)\s+(?:NUL\s+)?([0-9A-Z-]+)\s+(?:NUL\s+)?([0-9A-Z-]+)\s+([0-9,]+)\s+([0-9,]+)\s+([0-9,]+)\s+([0-9,]+)$"
 
 STOP_ONE_ADDRESS_REGEX = (
@@ -210,6 +210,7 @@ class LAShipmentCreationPdfParser:
 
         if len(parts) > 1:
             for line in parts[1].splitlines():
+                alt_alt_regex_matched = False
                 # Debug: print line
                 # print(f"line : {line}", file=sys.stderr)
                 m = re.match(REGEX, line.strip())
