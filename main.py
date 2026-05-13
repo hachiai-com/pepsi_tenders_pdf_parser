@@ -138,6 +138,25 @@ def get_cases_and_order_no(value: str) -> dict:
     }
 
 
+def po_with_sap_fallback(po_raw, sap_order) -> str:
+    """
+    NewLoadTender line items: if PO Number is empty or NUL, use SAP Order#.
+    """
+    po = (po_raw or "")
+    if isinstance(po, str):
+        po = po.replace("NUL", "").strip()
+    else:
+        po = str(po).strip() if po else ""
+    sap = (sap_order or "")
+    if isinstance(sap, str):
+        sap = sap.strip()
+    else:
+        sap = str(sap).strip() if sap else ""
+    if not po and sap and sap.upper() != "NUL":
+        return sap
+    return po
+
+
 # -------------------------------------------------
 # Core Parser
 # -------------------------------------------------
@@ -249,7 +268,7 @@ class LAShipmentCreationPdfParser:
 
                 if alt_alt_regex_matched:
                     # Set line item data
-                    record[3] = m.group(4).replace("NUL", "").strip()              # po
+                    record[3] = po_with_sap_fallback(m.group(4), m.group(2))     # po; SAP if PO empty
                     record[4] = m.group(6)              # cases
                     record[5] = m.group(7)              # pallets
                     record[6] = m.group(8)              # weight
@@ -260,7 +279,7 @@ class LAShipmentCreationPdfParser:
                     record[16] = m.group(1)             # Pepsi Co Order#
                 else:
                     # Set line item data
-                    record[3] = m.group(4).replace("NUL", "").strip()              # po
+                    record[3] = po_with_sap_fallback(m.group(4), m.group(2))     # po; SAP if PO empty
                     record[4] = m.group(5)              # cases
                     record[5] = m.group(6)              # pallets
                     record[6] = m.group(7)              # weight
